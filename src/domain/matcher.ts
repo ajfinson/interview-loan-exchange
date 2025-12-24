@@ -95,9 +95,9 @@ export class LoanMatcher {
       return { isMatch: false, score: 0, reasons: ['Loan purpose not accepted'] };
     }
 
-    // Check term
+    // Check term (shorter terms are preferred as they represent lower risk)
     if (application.requestedTerm <= bank.maxTermMonths) {
-      const termScore = (application.requestedTerm / bank.maxTermMonths) * 100;
+      const termScore = ((bank.maxTermMonths - application.requestedTerm) / bank.maxTermMonths) * 100;
       score += termScore * MATCHING_WEIGHTS.TERM;
       reasons.push('Requested term within limits');
     } else {

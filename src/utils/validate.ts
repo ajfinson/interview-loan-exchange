@@ -8,7 +8,7 @@ import { ValidationError } from './errors';
 
 export function validateLoanApplication(application: LoanApplication): void {
   // Validate required fields
-  if (!application.id || !application.applicantName) {
+  if (!application.id || !application.id.trim() || !application.applicantName || !application.applicantName.trim()) {
     throw new ValidationError('Application ID and applicant name are required');
   }
 

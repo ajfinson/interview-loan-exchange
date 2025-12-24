@@ -1,24 +1,35 @@
+export const BORROWER_TYPES = ['business', 'consumer'] as const;
+export const LOAN_TYPES = [
+  'Student loan',
+  'Equipment financing loan',
+  'Working capital loan',
+  'Term loan',
+  'Line of credit loan',
+  'SBA loan'
+] as const;
+
 export interface LoanApplication {
   id: string;
-  applicantName: string;
-  loanAmount: number;
-  loanPurpose: 'home' | 'auto' | 'business' | 'personal';
-  creditScore: number;
-  annualIncome: number;
-  employmentYears: number;
-  existingDebts: number;
+  requestedAmount: number;
+  borrowerType: string;
+  loanType: typeof LOAN_TYPES[number];
+  state: string; // e.g., "CA", "NY", "TX"
+  industry?: string; // e.g., "retail", "saas", "construction", "restaurant"
+  riskLevel: number; // 1-100
+  currentYearIncome: number;
+  previousYearIncome: number;
+}
+
+export interface Constraint {
+  name: string;
+  check: (application: LoanApplication) => boolean;
+  isActive: (application: LoanApplication) => boolean;
+  getFailureReason?: (application: LoanApplication) => string;
 }
 
 export interface Bank {
-  id: string;
   name: string;
-  minCreditScore: number;
-  maxLoanAmount: number;
-  minLoanAmount: number;
-  supportedPurposes: Array<'home' | 'auto' | 'business' | 'personal'>;
-  minIncome: number;
-  maxDebtToIncomeRatio: number;
-  interestRate: number;
+  constraints: Constraint[];
 }
 
 export interface MatchResult {
@@ -28,6 +39,6 @@ export interface MatchResult {
 
 export interface BankMatch {
   bank: Bank;
-  score: number;
+  numberOfConstraints: number;
   reason: string;
 }

@@ -1,4 +1,4 @@
-import { LoanApplication } from '../domain/types';
+import { LoanApplication, BORROWER_TYPES, LOAN_TYPES } from '../domain/types';
 import { ValidationError } from './errors';
 
 export function validateLoanApplication(data: any): LoanApplication {
@@ -6,43 +6,47 @@ export function validateLoanApplication(data: any): LoanApplication {
     throw new ValidationError('Invalid or missing application id');
   }
 
-  if (!data.applicantName || typeof data.applicantName !== 'string') {
-    throw new ValidationError('Invalid or missing applicant name');
+  if (typeof data.requestedAmount !== 'number' || data.requestedAmount <= 0) {
+    throw new ValidationError('Requested amount must be a positive number');
   }
 
-  if (typeof data.loanAmount !== 'number' || data.loanAmount <= 0) {
-    throw new ValidationError('Loan amount must be a positive number');
+  if (!BORROWER_TYPES.includes(data.borrowerType)) {
+    throw new ValidationError(`Borrower type must be one of: ${BORROWER_TYPES.join(', ')}`);
   }
 
-  const validPurposes = ['home', 'auto', 'business', 'personal'];
-  if (!validPurposes.includes(data.loanPurpose)) {
-    throw new ValidationError(`Loan purpose must be one of: ${validPurposes.join(', ')}`);
+  if (!LOAN_TYPES.includes(data.loanType)) {
+    throw new ValidationError(`Loan type must be one of: ${LOAN_TYPES.join(', ')}`);
   }
 
-  if (typeof data.creditScore !== 'number' || data.creditScore < 300 || data.creditScore > 850) {
-    throw new ValidationError('Credit score must be between 300 and 850');
+  if (!data.state || typeof data.state !== 'string') {
+    throw new ValidationError('State is required (e.g., CA, NY, TX)');
   }
 
-  if (typeof data.annualIncome !== 'number' || data.annualIncome <= 0) {
-    throw new ValidationError('Annual income must be a positive number');
+  if (typeof data.riskLevel !== 'number' || data.riskLevel < 1 || data.riskLevel > 100) {
+    throw new ValidationError('Risk level must be between 1 and 100');
   }
 
-  if (typeof data.employmentYears !== 'number' || data.employmentYears < 0) {
-    throw new ValidationError('Employment years must be a non-negative number');
+  if (typeof data.currentYearIncome !== 'number' || data.currentYearIncome <= 0) {
+    throw new ValidationError('Current year income must be a positive number');
   }
 
-  if (typeof data.existingDebts !== 'number' || data.existingDebts < 0) {
-    throw new ValidationError('Existing debts must be a non-negative number');
+  if (typeof data.previousYearIncome !== 'number' || data.previousYearIncome <= 0) {
+    throw new ValidationError('Previous year income must be a positive number');
+  }
+
+  if (data.industry !== undefined && typeof data.industry !== 'string') {
+    throw new ValidationError('Industry must be a string');
   }
 
   return {
     id: data.id,
-    applicantName: data.applicantName,
-    loanAmount: data.loanAmount,
-    loanPurpose: data.loanPurpose,
-    creditScore: data.creditScore,
-    annualIncome: data.annualIncome,
-    employmentYears: data.employmentYears,
-    existingDebts: data.existingDebts
+    requestedAmount: data.requestedAmount,
+    borrowerType: data.borrowerType,
+    loanType: data.loanType,
+    state: data.state,
+    industry: data.industry,
+    riskLevel: data.riskLevel,
+    currentYearIncome: data.currentYearIncome,
+    previousYearIncome: data.previousYearIncome
   };
 }
